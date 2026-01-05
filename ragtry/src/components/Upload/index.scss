@@ -1,0 +1,163 @@
+.upload {
+  max-width: 700px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+
+  .description {
+    font-size: 1.125rem;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+  }
+
+  .upload-area {
+    border: 3px dashed #bdc3c7;
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: border-color 0.3s ease;
+
+    &:hover {
+      border-color: #3498db;
+    }
+
+    .upload-content {
+      .upload-icon {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+      }
+
+      .file-label {
+        display: inline-block;
+        padding: 0.875rem 2rem;
+        background-color: #3498db;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 1rem;
+
+        &:hover {
+          background-color: #2980b9;
+        }
+
+        input {
+          display: none;
+        }
+      }
+
+      .file-types {
+        font-size: 0.875rem;
+        color: #95a5a6;
+      }
+    }
+  }
+
+  .file-preview {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .file-icon {
+        font-size: 2.5rem;
+      }
+
+      .file-details {
+        flex: 1;
+
+        .file-name {
+          font-weight: 600;
+          color: #2c3e50;
+          margin-bottom: 0.25rem;
+        }
+
+        .file-size {
+          font-size: 0.875rem;
+          color: #7f8c8d;
+        }
+      }
+
+      .remove-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #c0392b;
+        }
+      }
+    }
+
+    .upload-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.125rem;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #229954;
+      }
+
+      &:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Add this to your existing Upload styles
+
+.error-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #fee;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  span {
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: #c0392b;
+    margin: 0;
+  }
+}
