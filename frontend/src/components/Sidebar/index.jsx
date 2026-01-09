@@ -21,6 +21,9 @@ const Sidebar = () => {
         <NavLink to="/chat" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           <span>💬</span> Chat
         </NavLink>
+        <NavLink to="/legal-advice" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+          <span>⚖️</span> Legal Advice
+        </NavLink>
       </nav>
 
       {uploadedDoc && (

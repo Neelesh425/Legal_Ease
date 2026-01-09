@@ -5,6 +5,7 @@ import os
 import uuid
 from document_processor import extract_text_from_file
 from ollama_handler import chat_with_document
+from legal_handler import LegalHandler  # NEW IMPORT
 
 app = FastAPI()
 
@@ -24,10 +25,20 @@ documents = {}
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# Initialize legal handler - NEW
+legal_handler = LegalHandler(model_name="llama3.2")  # Use same model as your document chat
+
 class ChatRequest(BaseModel):
     document_id: str
     question: str
     model: str = "llama3.2"  # Default model, change if you have a different one
+
+# NEW: Legal chat request models
+class LegalChatRequest(BaseModel):
+    message: str
+
+class LegalChatHistoryRequest(BaseModel):
+    messages: list
 
 @app.get("/")
 async def root():
@@ -92,6 +103,47 @@ async def chat(request: ChatRequest):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing chat: {str(e)}")
+
+# NEW: Legal chat endpoint
+@app.post("/api/legal/chat")
+async def legal_chat(request: LegalChatRequest):
+    """
+    Legal advice chat endpoint - does not require document upload
+    """
+    try:
+        if not request.message:
+            raise HTTPException(status_code=400, detail="Message is required")
+        
+        # Simple chat without history
+        response = legal_handler.chat(request.message)
+        
+        return {
+            "status": "success",
+            "response": response,
+            "disclaimer": "This is general legal information, not legal advice. Please consult with a licensed attorney for specific legal matters."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# NEW: Legal chat with history endpoint
+@app.post("/api/legal/chat-history")
+async def legal_chat_with_history(request: LegalChatHistoryRequest):
+    """
+    Legal chat with conversation history
+    """
+    try:
+        if not request.messages:
+            raise HTTPException(status_code=400, detail="Messages are required")
+        
+        response = legal_handler.chat_with_history(request.messages)
+        
+        return {
+            "status": "success",
+            "response": response,
+            "disclaimer": "This is general legal information, not legal advice. Please consult with a licensed attorney for specific legal matters."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/document/{document_id}")
 async def get_document(document_id: str):
