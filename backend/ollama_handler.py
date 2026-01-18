@@ -38,3 +38,5 @@ def get_available_models():
         return [model['name'] for model in models['models']]
     except Exception as e:
         raise Exception(f"Error getting models: {str(e)}")
+    
+    

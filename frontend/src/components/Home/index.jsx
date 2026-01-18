@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div className="home">
       <div className="home-content">
-        <h1>Welcome to DocChat AI</h1>
+        <h1>Welcome to LegalEase</h1>
         <p className="subtitle">
           Upload your documents and ask questions about them using the power of AI
         </p>
