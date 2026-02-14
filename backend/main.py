@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import uuid
-from document_processor import extract_text_from_file
+from document_processor import extract_text_from_file, store_document_in_chromadb, delete_document_from_chromadb
 from ollama_handler import chat_with_document
 from legal_handler import LegalHandler
 from auth import (
@@ -60,7 +60,7 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     """Get current user information"""
     return current_user
 
-# ============= EXISTING ENDPOINTS (Now Protected) =============
+# ============= DOCUMENT ENDPOINTS WITH RAG =============
 
 @app.get("/")
 async def root():
@@ -75,32 +75,39 @@ async def upload_document(
         doc_id = str(uuid.uuid4())
         file_path = os.path.join(UPLOAD_DIR, f"{doc_id}_{file.filename}")
         
+        # Save file
         with open(file_path, "wb") as f:
             content = await file.read()
             f.write(content)
         
+        # Extract text
         text = extract_text_from_file(file_path, file.filename)
         
         if not text:
             raise HTTPException(status_code=400, detail="Could not extract text from file")
         
+        # Store in ChromaDB with RAG
+        num_chunks = store_document_in_chromadb(doc_id, text, file.filename)
+        
+        # Store metadata only (not full text)
         documents[doc_id] = {
             "id": doc_id,
             "filename": file.filename,
-            "text": text,
             "file_path": file_path,
-            "user_email": current_user["email"]
+            "user_email": current_user["email"],
+            "num_chunks": num_chunks
         }
         
         return {
             "document_id": doc_id,
             "filename": file.filename,
-            "text_length": len(text),
-            "message": "Document uploaded successfully"
+            "num_chunks": num_chunks,
+            "message": "Document uploaded and processed with RAG"
         }
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+
 
 @app.post("/chat")
 async def chat(
@@ -117,8 +124,9 @@ async def chat(
         if document.get("user_email") != current_user["email"]:
             raise HTTPException(status_code=403, detail="Access denied")
         
+        # Use RAG: pass document_id instead of full text
         response = chat_with_document(
-            document_text=document["text"],
+            document_id=request.document_id,
             question=request.question,
             model=request.model
         )
@@ -186,8 +194,7 @@ async def get_document(
     return {
         "id": doc["id"],
         "filename": doc["filename"],
-        "text_length": len(doc["text"]),
-        "preview": doc["text"][:500] + "..." if len(doc["text"]) > 500 else doc["text"]
+        "num_chunks": doc.get("num_chunks", 0)
     }
 
 @app.get("/models")
